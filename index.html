@@ -1,0 +1,382 @@
+<title>Crack the Code</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+SC:wght@400;500&display=swap">
+<style>
+/* Layout: phone-first "code-breaker console" for students; wide two-column projector console at #host. Single dark look by choice, matching the workshop video. */
+:root{
+  --bg:#0E1A2B; --panel:#16263D; --panel-2:#132238; --line:#2A3D5A;
+  --fg:#F5F1E8; --muted:#A9B4C4; --teal:#2EC4B6; --gold:#F4C95D; --red:#FF6B4A;
+  --teal-soft:rgba(46,196,182,.14); --gold-soft:rgba(244,201,93,.14); --red-soft:rgba(255,107,74,.14);
+  --display:'Chakra Petch','Trebuchet MS',sans-serif;
+  --body:'IBM Plex Sans','Noto Sans SC',system-ui,sans-serif;
+  --mono:'JetBrains Mono','Courier New',monospace;
+  --cn:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px;
+  background-image:radial-gradient(circle at 80% 0%,rgba(46,196,182,.12),transparent 55%);background-attachment:fixed}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.wrap{max-width:540px;margin-inline:auto;display:flex;flex-direction:column;gap:16px}
+.eyebrow{font:600 12px/1.2 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+h1{font:700 clamp(34px,9vw,44px)/1.05 var(--display);margin:0;text-wrap:balance;letter-spacing:.01em}
+h2{font:700 24px/1.15 var(--display);margin:0;text-wrap:balance}
+.cn{font-family:var(--cn);color:var(--muted);font-size:14px}
+.muted{color:var(--muted)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{border:0;border-radius:10px;padding:13px 18px;font-weight:600;cursor:pointer;background:var(--teal);color:#0B1622;min-height:48px}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn.gold{background:var(--gold);color:#1E1A0E}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+input[type=text]{width:100%;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:13px 14px;font:700 20px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;text-transform:none;font-family:var(--body);font-size:16px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:5px}
+.tab{border:0;border-radius:8px;padding:10px 6px;background:transparent;color:var(--muted);font-weight:600;cursor:pointer;font-size:14px}
+.tab[aria-selected=true]{background:var(--panel);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+.tab:disabled{opacity:.4;cursor:not-allowed}
+.cipher{font:700 clamp(30px,9.5vw,46px)/1.1 var(--mono);letter-spacing:.08em;color:var(--teal);word-break:break-word;text-shadow:0 0 22px rgba(46,196,182,.35)}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 14px;font:700 15px var(--mono);border:1px solid}
+.pill.key{color:var(--gold);border-color:var(--gold);background:var(--gold-soft)}
+.pill.nokey{color:var(--red);border-color:var(--red);background:var(--red-soft)}
+.pill.time{color:var(--muted);border-color:var(--line);font-variant-numeric:tabular-nums}
+.strip{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:3px}
+.cell{display:flex;flex-direction:column;align-items:center;border-radius:6px;background:var(--panel-2);padding:4px 0;font:700 15px/1.25 var(--mono)}
+.cell .top{color:var(--fg)} .cell .bot{color:var(--teal)} .cell .num{font:500 10px var(--body);color:var(--muted)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted)}
+.legend b{color:var(--fg)} .legend b.t{color:var(--teal)}
+.feedback{min-height:22px;font-weight:600}
+.feedback.bad{color:var(--red)}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+.cracked{background:var(--teal);color:#0B1622;border-radius:16px;padding:24px 20px;display:flex;flex-direction:column;gap:6px;text-align:center}
+.cracked .big{font:700 46px/1 var(--display);letter-spacing:.04em}
+.cracked .ans{font:700 22px var(--mono);letter-spacing:.08em}
+.cracked .meta{font-weight:600}
+.split{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.split div{background:var(--panel-2);border-radius:8px;padding:8px 6px;text-align:center;font-size:12px;color:var(--muted)}
+.split b{display:block;color:var(--gold);font:700 14px var(--mono)}
+.hint{border:1px dashed var(--gold);border-radius:10px;padding:10px 12px;color:var(--gold);background:var(--gold-soft)}
+.trylist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px;font:500 13px var(--mono)}
+.trylist div{padding:5px 8px;border-radius:6px;background:var(--panel-2);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trylist div.hit{background:var(--teal);color:#0B1622;font-weight:700}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.compare .num{font:700 34px/1 var(--display)}
+.compare div{background:var(--panel-2);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.compare .r{color:var(--red)} .compare .t{color:var(--teal)}
+.foot{font-size:12px;color:var(--muted);text-align:center}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px;padding:6px}
+
+/* ---------- projector console ---------- */
+.host{max-width:1500px;margin-inline:auto;display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:24px;align-items:start}
+.host .panel{padding:24px}
+.qrbox{background:#F5F1E8;border-radius:14px;padding:16px;display:flex;justify-content:center;aspect-ratio:1;max-width:100%}
+.qrbox canvas,.qrbox img{width:100%!important;height:auto!important;image-rendering:pixelated}
+.urltext{font:500 13px var(--mono);color:var(--muted);word-break:break-all}
+.stage{display:flex;flex-direction:column;gap:20px;min-width:0}
+.stage .cipher{font-size:clamp(40px,6vw,92px)}
+.timer{font:700 clamp(56px,8vw,120px)/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.timer.low{color:var(--red)}
+.answer{font:700 clamp(30px,4.5vw,64px)/1.1 var(--mono);color:var(--gold);letter-spacing:.06em}
+.hoststrip .cell{font-size:clamp(14px,1.6vw,24px)}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+@media (max-width:900px){.host{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}
+</style>
+
+<main id="student" class="wrap" hidden>
+  <header style="display:flex;flex-direction:column;gap:6px">
+    <span class="eyebrow">Mission 2 · Encryption</span>
+    <h1>Crack the Code</h1>
+  </header>
+
+  <section id="join" class="panel" hidden>
+    <h2>Your team name</h2>
+    <p class="muted" style="margin:0">One phone per team is enough.</p>
+    <form id="joinForm" class="row" style="flex-wrap:nowrap">
+      <input id="teamInput" type="text" maxlength="20" placeholder="e.g. Team Panda" autocomplete="off" style="font-size:18px;text-transform:none;letter-spacing:0;font-family:var(--body)">
+      <button class="btn" type="submit">Start</button>
+    </form>
+  </section>
+
+  <div id="game" hidden style="display:flex;flex-direction:column;gap:16px">
+    <div class="row" style="justify-content:space-between">
+      <span class="muted">Team <b id="teamName" style="color:var(--fg)"></b></span>
+      <span><button class="linkbtn" id="renameBtn" type="button">Change name</button><button class="linkbtn" id="resetBtn" type="button">Start over</button></span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Rounds">
+      <button class="tab" role="tab" id="tab-r1" data-round="r1">Round 1</button>
+      <button class="tab" role="tab" id="tab-r2" data-round="r2">Round 2</button>
+      <button class="tab" role="tab" id="tab-pc" data-round="pc">Computer</button>
+    </nav>
+
+    <!-- Round 1 -->
+    <section id="r1" class="panel" role="tabpanel">
+      <div class="row" style="justify-content:space-between"><span class="eyebrow" style="color:var(--teal)">Round 1 · You have the key</span><span class="pill time" id="r1Time">0:00</span></div>
+      <div class="cipher" id="r1Cipher"></div>
+      <div class="row"><span class="pill key">KEY = 3</span><span class="muted" style="font-size:14px">Find each letter in the <b style="color:var(--teal)">code</b> row. The real letter is above it.</span></div>
+      <div class="legend"><span><b>Top</b> = real letter</span><span><b class="t">Bottom</b> = code letter</span></div>
+      <div class="strip" id="r1Strip"></div>
+      <form class="answerForm" data-round="r1" style="display:flex;flex-direction:column;gap:10px">
+        <label for="r1Answer" class="muted" style="font-size:14px">Your answer</label>
+        <div class="row" style="flex-wrap:nowrap"><input id="r1Answer" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Type the real message"><button class="btn" type="submit">Check</button></div>
+        <div class="feedback" id="r1Feedback" aria-live="polite"></div>
+      </form>
+      <div id="r1Done" hidden></div>
+    </section>
+
+    <!-- Round 2 -->
+    <section id="r2" class="panel" role="tabpanel" hidden>
+      <div class="row" style="justify-content:space-between"><span class="eyebrow" style="color:var(--red)">Round 2 · No key</span><span class="pill time" id="r2Time">0:00</span></div>
+      <div class="cipher" id="r2Cipher"></div>
+      <div class="row"><span class="pill nokey">KEY = ?</span><span class="muted" style="font-size:14px">Try keys on paper. Move each letter <b style="color:var(--fg)">back</b> by the key.</span></div>
+      <p style="margin:0;font-size:14px">Split the work: each person tests a few keys. One key moves <b>every</b> letter back by the same number.</p>
+      <div class="split"><div>Part 1<b>keys 1–8</b></div><div>Part 2<b>keys 9–16</b></div><div>Part 3<b>keys 17–25</b></div></div>
+      <div class="legend"><span>Example with key 2: every letter moves back 2, so <b>D</b> (4) becomes <b>B</b> (2). Test the first word only; when it becomes a real word, you found the key.</span></div>
+      <div class="strip" id="r2Strip"></div>
+      <form class="answerForm" data-round="r2" style="display:flex;flex-direction:column;gap:10px">
+        <label for="r2Answer" class="muted" style="font-size:14px">Your answer</label>
+        <div class="row" style="flex-wrap:nowrap"><input id="r2Answer" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Type the real message"><button class="btn" type="submit">Check</button></div>
+        <div class="feedback" id="r2Feedback" aria-live="polite"></div>
+      </form>
+      <div class="hint" id="r2Hint" hidden>Hint 1: the key is bigger than 10.</div>
+      <div class="hint" id="r2Hint2" hidden>Hint 2: the key is 15, 16 or 17.</div>
+      <button class="btn ghost" id="hintBtn" type="button" hidden>Show a hint</button>
+      <div id="r2Done" hidden></div>
+    </section>
+
+    <!-- Computer mode -->
+    <section id="pc" class="panel" role="tabpanel" hidden>
+      <span class="eyebrow">Bonus · Let a computer try</span>
+      <h2>How fast can a computer guess the key?</h2>
+      <p class="muted" style="margin:0">Your team tried keys by hand. Press the button and this phone tries all 25 keys.</p>
+      <button class="btn gold" id="bruteBtn" type="button">Try all 25 keys</button>
+      <p id="bruteResult" style="margin:0;font-weight:600" aria-live="polite"></p>
+      <div class="trylist" id="tryList"></div>
+      <div class="compare">
+        <div><span class="muted" style="font-size:13px">Today’s cipher</span><span class="num r">25</span><span style="font-size:13px">possible keys</span></div>
+        <div><span class="muted" style="font-size:13px">Real encryption (HTTPS)</span><span class="num t">2<sup>128</sup></span><span style="font-size:13px">possible keys, a 39-digit number</span></div>
+      </div>
+      <p style="margin:0">Trying every key of real encryption would take longer than the age of the universe. No key, no message.</p>
+    </section>
+  </div>
+  <p class="foot">Encryption &amp; Passwords workshop · CAL3</p>
+</main>
+
+<main id="host" hidden>
+  <div class="host">
+    <aside class="panel" style="gap:16px">
+      <span class="eyebrow">Mission 2 · Scan to join</span>
+      <h2 style="font-size:32px">Crack the Code</h2>
+      <div class="qrbox" id="qr" role="img" aria-label="QR code that opens the student page"></div>
+      <div class="urltext" id="urlText"></div>
+      <ol class="steps muted">
+        <li>One phone per team scans the code.</li>
+        <li>Type a team name, then decode the message.</li>
+        <li>First team to show <b style="color:var(--teal)">CRACKED</b> wins.</li>
+      </ol>
+    </aside>
+    <section class="stage">
+      <nav class="tabs" role="tablist" aria-label="Presenter steps" style="max-width:560px">
+        <button class="tab" role="tab" id="htab-r1" data-step="r1">Round 1</button>
+        <button class="tab" role="tab" id="htab-r2" data-step="r2">Round 2</button>
+        <button class="tab" role="tab" id="htab-db" data-step="db">Debrief</button>
+      </nav>
+      <div class="panel" id="hostRound">
+        <div class="row" style="justify-content:space-between">
+          <span class="eyebrow" id="hEyebrow"></span>
+          <span class="pill" id="hKey"></span>
+        </div>
+        <div class="cipher" id="hCipher"></div>
+        <div class="strip hoststrip" id="hStrip"></div>
+        <div class="row" style="justify-content:space-between;align-items:flex-end">
+          <div class="timer" id="hTimer">2:00</div>
+          <div class="row">
+            <button class="btn" id="hStart" type="button">Start timer</button>
+            <button class="btn ghost" id="hReset" type="button">Reset</button>
+            <button class="btn gold" id="hReveal" type="button">Reveal answer</button>
+          </div>
+        </div>
+        <div id="hAnswer" hidden style="display:flex;flex-direction:column;gap:4px">
+          <span class="muted" id="hAnswerLabel"></span>
+          <div class="answer" id="hAnswerText"></div>
+        </div>
+      </div>
+      <div class="panel" id="hostDebrief" hidden>
+        <span class="eyebrow">Debrief</span>
+        <h2 style="font-size:clamp(28px,3.4vw,48px)">Which round was easier, and why?</h2>
+        <p style="margin:0;font-size:22px">“Round ___ was easier because ___________.”</p>
+        <div class="row"><button class="btn gold" id="hBrute" type="button">Let the computer try all 25 keys</button><span id="hBruteResult" style="font-weight:600"></span></div>
+        <div class="trylist" id="hTryList" style="font-size:16px"></div>
+        <div class="compare">
+          <div><span class="muted">Today’s cipher</span><span class="num r" style="font-size:56px">25</span><span>possible keys</span></div>
+          <div><span class="muted">Real encryption (HTTPS)</span><span class="num t" style="font-size:56px">2<sup>128</sup></span><span>possible keys, a 39-digit number</span></div>
+        </div>
+        <p style="margin:0;font-size:20px">No key, no message. That’s how HTTPS keeps your password safe on the way.</p>
+      </div>
+      <button class="linkbtn" id="toStudent" type="button" style="align-self:flex-start">Open the student view on this screen</button>
+    </section>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function(){
+  var STUDENT_URL = "https://claude.ai/artifact/LgxMqZFaqB7WUjt57QTJBJ";
+  var A = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var ROUNDS = {
+    r1:{cipher:"VWURQJ SDVVZRUGV", key:3, secs:120},
+    r2:{cipher:"THYDA MQJUH", key:16, secs:180}
+  };
+  function shift(text, k){ return text.replace(/[A-Z]/g, function(c){ return A[(A.indexOf(c)+k+26*10)%26]; }); }
+  function norm(s){ return (s||"").toUpperCase().replace(/[^A-Z]/g,""); }
+  function fmt(s){ s=Math.max(0,Math.floor(s)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+  function $(id){ return document.getElementById(id); }
+  var store = {
+    get:function(k){ try{ return JSON.parse(localStorage.getItem("ctc:"+k)); }catch(e){ return null; } },
+    set:function(k,v){ try{ localStorage.setItem("ctc:"+k, JSON.stringify(v)); }catch(e){} }
+  };
+
+  function buildStrip(el, mode, key){
+    el.innerHTML = "";
+    for (var i=0;i<26;i++){
+      var c=document.createElement("div"); c.className="cell";
+      var t=document.createElement("span"); t.className="top"; t.textContent=A[i]; c.appendChild(t);
+      var b=document.createElement("span");
+      if (mode==="map"){ b.className="bot"; b.textContent=A[(i+key)%26]; }
+      else { b.className="num"; b.textContent=String(i+1); }
+      c.appendChild(b); el.appendChild(c);
+    }
+  }
+
+  function bruteForce(cipher, listEl, resultEl, key){
+    var t0=performance.now(), out=[];
+    for (var k=1;k<=25;k++) out.push({k:k, text:shift(cipher,-k)});
+    var ms=performance.now()-t0;
+    listEl.innerHTML="";
+    out.forEach(function(o,i){
+      var d=document.createElement("div"); d.textContent="key "+o.k+" → "+o.text;
+      if (o.k===key) d.className="hit";
+      d.style.opacity="0"; listEl.appendChild(d);
+      setTimeout(function(){ d.style.opacity="1"; }, matchMedia("(prefers-reduced-motion: reduce)").matches?0:i*45);
+    });
+    resultEl.textContent = "Done: 25 keys tried in "+(ms<0.1?"less than 0.1":ms.toFixed(2))+" milliseconds. Key "+key+" gives a real message.";
+  }
+
+  /* ---------------- student ---------------- */
+  var started = {}, timers = {}, solved = store.get("solved") || {};
+  Object.keys(solved).forEach(function(r){ if (!ROUNDS[r] || !solved[r] || solved[r].cipher !== ROUNDS[r].cipher) delete solved[r]; });
+  store.set("solved", solved);
+  function resetAll(){
+    solved = {}; started = {}; store.set("solved", solved);
+    ["r1","r2"].forEach(function(r){ $(r+"Done").hidden=true; $(r+"Done").innerHTML=""; $(r).querySelector(".answerForm").hidden=false; $(r+"Answer").value=""; $(r+"Feedback").textContent=""; $(r+"Time").textContent="0:00"; });
+    $("r2Hint").hidden=true; $("r2Hint2").hidden=true; $("hintBtn").hidden=true; $("tryList").innerHTML=""; $("bruteResult").textContent="";
+    refreshTabs(); showRound("r1"); window.scrollTo(0,0);
+  }
+  function startStudent(){
+    $("student").hidden=false;
+    $("r1Cipher").textContent=ROUNDS.r1.cipher; $("r2Cipher").textContent=ROUNDS.r2.cipher;
+    buildStrip($("r1Strip"),"map",3); buildStrip($("r2Strip"),"num",0);
+    var team = store.get("team");
+    if (team) enterGame(team); else $("join").hidden=false;
+    $("joinForm").addEventListener("submit",function(e){ e.preventDefault(); var n=$("teamInput").value.trim(); if(!n){ $("teamInput").focus(); return; } store.set("team",n); enterGame(n); });
+    $("resetBtn").addEventListener("click", resetAll);
+    $("renameBtn").addEventListener("click",function(){ $("game").hidden=true; $("join").hidden=false; $("teamInput").value=$("teamName").textContent; $("teamInput").focus(); });
+    document.querySelectorAll("#game .tab").forEach(function(b){ b.addEventListener("click",function(){ showRound(b.dataset.round); }); });
+    document.querySelectorAll(".answerForm").forEach(function(f){ f.addEventListener("submit",function(e){ e.preventDefault(); check(f.dataset.round); }); });
+    $("hintBtn").addEventListener("click",function(){ if ($("r2Hint").hidden) $("r2Hint").hidden=false; else $("r2Hint2").hidden=false; $("hintBtn").hidden=true; });
+    $("bruteBtn").addEventListener("click",function(){ bruteForce(ROUNDS.r2.cipher,$("tryList"),$("bruteResult"),ROUNDS.r2.key); });
+    setInterval(tick,500);
+  }
+  function enterGame(team){
+    $("join").hidden=true; $("game").hidden=false; $("teamName").textContent=team;
+    refreshTabs(); showRound(solved.r1 ? (solved.r2 ? "pc" : "r2") : "r1");
+    if (solved.r1) markDone("r1"); if (solved.r2) markDone("r2");
+  }
+  function refreshTabs(){ $("tab-r2").disabled=!solved.r1; $("tab-pc").disabled=!solved.r2; }
+  function showRound(r){
+    ["r1","r2","pc"].forEach(function(x){ $(x).hidden = x!==r; $("tab-"+x).setAttribute("aria-selected", x===r?"true":"false"); });
+    if ((r==="r1"||r==="r2") && !started[r]) started[r]=Date.now();
+  }
+  function tick(){
+    ["r1","r2"].forEach(function(r){
+      if (!started[r] || solved[r]) return;
+      var s=(Date.now()-started[r])/1000; $(r+"Time").textContent=fmt(s);
+      if (r==="r2"){ if ($("r2Hint").hidden){ if (s>75) $("hintBtn").hidden=false; } else if ($("r2Hint2").hidden && s>120) $("hintBtn").hidden=false; }
+    });
+  }
+  function check(r){
+    var input=$(r+"Answer"), fb=$(r+"Feedback");
+    var guess=norm(input.value); if(!guess){ fb.className="feedback bad"; fb.textContent="Type your answer first."; return; }
+    var target=norm(shift(ROUNDS[r].cipher,-ROUNDS[r].key));
+    if (guess===target){
+      var secs=started[r]?(Date.now()-started[r])/1000:0;
+      solved[r]={time:fmt(secs), answer:shift(ROUNDS[r].cipher,-ROUNDS[r].key), cipher:ROUNDS[r].cipher}; store.set("solved",solved);
+      markDone(r); refreshTabs();
+    } else {
+      fb.className="feedback bad"; fb.textContent="Not quite. Check each letter again.";
+      input.classList.remove("shake"); void input.offsetWidth; input.classList.add("shake");
+    }
+  }
+  function markDone(r){
+    var s=solved[r], box=$(r+"Done");
+    box.innerHTML=""; var c=document.createElement("div"); c.className="cracked";
+    var big=document.createElement("div"); big.className="big"; big.textContent="CRACKED";
+    var ans=document.createElement("div"); ans.className="ans"; ans.textContent=s.answer;
+    var meta=document.createElement("div"); meta.className="meta"; meta.textContent="Team "+$("teamName").textContent+" · "+(r==="r1"?"Round 1":"Round 2")+" · "+s.time;
+    var tip=document.createElement("div"); tip.textContent="Hold up this screen!";
+    [big,ans,meta,tip].forEach(function(x){ c.appendChild(x); });
+    box.appendChild(c);
+    var next=document.createElement("button"); next.className="btn ghost"; next.type="button"; next.style.marginTop="10px";
+    next.textContent = r==="r1" ? "Go to Round 2 when your presenter says so" : "Bonus: let a computer try";
+    next.addEventListener("click",function(){ showRound(r==="r1"?"r2":"pc"); window.scrollTo(0,0); });
+    box.appendChild(next);
+    box.hidden=false; $(r).querySelector(".answerForm").hidden=true; $(r+"Time").textContent=s.time;
+    if (r==="r2"){ $("hintBtn").hidden=true; }
+  }
+
+  /* ---------------- host ---------------- */
+  var hStep="r1", remaining=ROUNDS.r1.secs, running=false, lastT=0;
+  function startHost(){
+    $("host").hidden=false;
+    $("urlText").textContent=STUDENT_URL;
+    try { new QRCode($("qr"),{text:STUDENT_URL,width:512,height:512,colorDark:"#0E1A2B",colorLight:"#F5F1E8",correctLevel:QRCode.CorrectLevel.M}); }
+    catch(e){ $("qr").textContent="QR code could not load. Use the link below."; }
+    document.querySelectorAll("#host .tab").forEach(function(b){ b.addEventListener("click",function(){ setStep(b.dataset.step); }); });
+    $("hStart").addEventListener("click",function(){ running=!running; lastT=performance.now(); $("hStart").textContent=running?"Pause":"Start timer"; });
+    $("hReset").addEventListener("click",function(){ remaining=ROUNDS[hStep].secs; running=false; $("hStart").textContent="Start timer"; drawTimer(); });
+    $("hReveal").addEventListener("click",function(){ $("hAnswer").hidden=false; });
+    $("hBrute").addEventListener("click",function(){ bruteForce(ROUNDS.r2.cipher,$("hTryList"),$("hBruteResult"),ROUNDS.r2.key); });
+    $("toStudent").addEventListener("click",function(){ location.hash=""; });
+    setStep("r1");
+    (function loop(t){ if(running){ remaining-=(t-lastT)/1000; if(remaining<=0){ remaining=0; running=false; $("hStart").textContent="Start timer"; } } lastT=t; drawTimer(); requestAnimationFrame(loop); })(performance.now());
+  }
+  function drawTimer(){ var el=$("hTimer"); el.textContent=fmt(Math.ceil(remaining)); el.classList.toggle("low", remaining<=20); }
+  function setStep(s){
+    hStep=s;
+    ["r1","r2","db"].forEach(function(x){ $("htab-"+x).setAttribute("aria-selected", x===s?"true":"false"); });
+    $("hostRound").hidden = s==="db"; $("hostDebrief").hidden = s!=="db";
+    if (s==="db") return;
+    var R=ROUNDS[s];
+    $("hEyebrow").textContent = s==="r1" ? "Round 1 · You have the key" : "Round 2 · No key";
+    $("hEyebrow").style.color = s==="r1" ? "var(--teal)" : "var(--red)";
+    $("hKey").className = "pill " + (s==="r1"?"key":"nokey"); $("hKey").textContent = s==="r1" ? "KEY = 3" : "KEY = ?";
+    $("hCipher").textContent=R.cipher;
+    buildStrip($("hStrip"), s==="r1"?"map":"num", R.key);
+    remaining=R.secs; running=false; $("hStart").textContent="Start timer"; drawTimer();
+    $("hAnswer").hidden=true; $("hAnswerLabel").textContent="Answer · key = "+R.key; $("hAnswerText").textContent=shift(R.cipher,-R.key);
+  }
+
+  function route(){ $("student").hidden=true; $("host").hidden=true; if (location.hash==="#host") startHostOnce(); else startStudentOnce(); }
+  var hostInit=false, studentInit=false;
+  function startHostOnce(){ if(!hostInit){ hostInit=true; startHost(); } else $("host").hidden=false; }
+  function startStudentOnce(){ if(!studentInit){ studentInit=true; startStudent(); } else $("student").hidden=false; }
+  window.addEventListener("hashchange", route);
+  route();
+})();
+</script>
