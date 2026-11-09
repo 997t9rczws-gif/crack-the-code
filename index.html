@@ -112,43 +112,12 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
     <nav class="tabs" role="tablist" aria-label="Rounds">
       <button class="tab" role="tab" id="tab-r1" data-round="r1">Round 1</button>
       <button class="tab" role="tab" id="tab-r2" data-round="r2">Round 2</button>
+      <button class="tab" role="tab" id="tab-r3" data-round="r3">Round 3</button>
+      <button class="tab" role="tab" id="tab-r4" data-round="r4">Round 4</button>
       <button class="tab" role="tab" id="tab-pc" data-round="pc">Computer</button>
     </nav>
 
-    <!-- Round 1 -->
-    <section id="r1" class="panel" role="tabpanel">
-      <div class="row" style="justify-content:space-between"><span class="eyebrow" style="color:var(--teal)">Round 1 · You have the key</span><span class="pill time" id="r1Time">0:00</span></div>
-      <div class="cipher" id="r1Cipher"></div>
-      <div class="row"><span class="pill key">KEY = 3</span><span class="muted" style="font-size:14px">Find each letter in the <b style="color:var(--teal)">code</b> row. The real letter is above it.</span></div>
-      <div class="legend"><span><b>Top</b> = real letter</span><span><b class="t">Bottom</b> = code letter</span></div>
-      <div class="strip" id="r1Strip"></div>
-      <form class="answerForm" data-round="r1" style="display:flex;flex-direction:column;gap:10px">
-        <label for="r1Answer" class="muted" style="font-size:14px">Your answer</label>
-        <div class="row" style="flex-wrap:nowrap"><input id="r1Answer" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Type the real message"><button class="btn" type="submit">Check</button></div>
-        <div class="feedback" id="r1Feedback" aria-live="polite"></div>
-      </form>
-      <div id="r1Done" hidden></div>
-    </section>
-
-    <!-- Round 2 -->
-    <section id="r2" class="panel" role="tabpanel" hidden>
-      <div class="row" style="justify-content:space-between"><span class="eyebrow" style="color:var(--red)">Round 2 · No key</span><span class="pill time" id="r2Time">0:00</span></div>
-      <div class="cipher" id="r2Cipher"></div>
-      <div class="row"><span class="pill nokey">KEY = ?</span><span class="muted" style="font-size:14px">Try keys on paper. Move each letter <b style="color:var(--fg)">back</b> by the key.</span></div>
-      <p style="margin:0;font-size:14px">Split the work: each person tests a few keys. One key moves <b>every</b> letter back by the same number.</p>
-      <div class="split"><div>Part 1<b>keys 1–8</b></div><div>Part 2<b>keys 9–16</b></div><div>Part 3<b>keys 17–25</b></div></div>
-      <div class="legend"><span>Example with key 2: every letter moves back 2, so <b>D</b> (4) becomes <b>B</b> (2). Test the first word only; when it becomes a real word, you found the key.</span></div>
-      <div class="strip" id="r2Strip"></div>
-      <form class="answerForm" data-round="r2" style="display:flex;flex-direction:column;gap:10px">
-        <label for="r2Answer" class="muted" style="font-size:14px">Your answer</label>
-        <div class="row" style="flex-wrap:nowrap"><input id="r2Answer" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Type the real message"><button class="btn" type="submit">Check</button></div>
-        <div class="feedback" id="r2Feedback" aria-live="polite"></div>
-      </form>
-      <div class="hint" id="r2Hint" hidden>Hint 1: the key is bigger than 10.</div>
-      <div class="hint" id="r2Hint2" hidden>Hint 2: the key is 15, 16 or 17.</div>
-      <button class="btn ghost" id="hintBtn" type="button" hidden>Show a hint</button>
-      <div id="r2Done" hidden></div>
-    </section>
+    <div id="roundPanels" style="display:contents"></div>
 
     <!-- Computer mode -->
     <section id="pc" class="panel" role="tabpanel" hidden>
@@ -182,9 +151,11 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
       </ol>
     </aside>
     <section class="stage">
-      <nav class="tabs" role="tablist" aria-label="Presenter steps" style="max-width:560px">
+      <nav class="tabs" role="tablist" aria-label="Presenter steps" style="max-width:820px">
         <button class="tab" role="tab" id="htab-r1" data-step="r1">Round 1</button>
         <button class="tab" role="tab" id="htab-r2" data-step="r2">Round 2</button>
+        <button class="tab" role="tab" id="htab-r3" data-step="r3">Round 3</button>
+        <button class="tab" role="tab" id="htab-r4" data-step="r4">Round 4</button>
         <button class="tab" role="tab" id="htab-db" data-step="db">Debrief</button>
       </nav>
       <div class="panel" id="hostRound">
@@ -209,8 +180,8 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
       </div>
       <div class="panel" id="hostDebrief" hidden>
         <span class="eyebrow">Debrief</span>
-        <h2 style="font-size:clamp(28px,3.4vw,48px)">Which round was easier, and why?</h2>
-        <p style="margin:0;font-size:22px">“Round ___ was easier because ___________.”</p>
+        <h2 style="font-size:clamp(28px,3.4vw,48px)">Which rounds were easier, and why?</h2>
+        <p style="margin:0;font-size:22px">“Rounds 1 and 2 were easier because ___________.”</p>
         <div class="row"><button class="btn gold" id="hBrute" type="button">Let the computer try all 25 keys</button><span id="hBruteResult" style="font-weight:600"></span></div>
         <div class="trylist" id="hTryList" style="font-size:16px"></div>
         <div class="compare">
@@ -227,30 +198,35 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 (function(){
-  var STUDENT_URL = "https://claude.ai/artifact/LgxMqZFaqB7WUjt57QTJBJ";
+  var STUDENT_URL = "https://997t9rczws-gif.github.io/crack-the-code/";
   var A = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var ORDER = ["r1","r2","r3","r4"];
   var ROUNDS = {
-    r1:{cipher:"VWURQJ SDVVZRUGV", key:3, secs:120},
-    r2:{cipher:"THYDA MQJUH", key:16, secs:180}
+    r1:{n:1, cipher:"VWURQJ SDVVZRUGV", key:3,  secs:120, known:true},
+    r2:{n:2, cipher:"SVJR FVBY WOVUL",  key:7,  secs:120, known:true},
+    r3:{n:3, cipher:"THYDA MQJUH",      key:16, secs:180, known:false, hints:["Hint 1: the key is bigger than 10.","Hint 2: the key is 15, 16 or 17."]},
+    r4:{n:4, cipher:"RZGG YJIZ",        key:21, secs:180, known:false, hints:["Hint 1: the key is bigger than 16.","Hint 2: the key is 20, 21 or 22."]}
   };
+  var HINT_AT=[75,120];
   function shift(text, k){ return text.replace(/[A-Z]/g, function(c){ return A[(A.indexOf(c)+k+26*10)%26]; }); }
   function norm(s){ return (s||"").toUpperCase().replace(/[^A-Z]/g,""); }
   function fmt(s){ s=Math.max(0,Math.floor(s)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
   function $(id){ return document.getElementById(id); }
+  function el(tag, attrs, html){ var e=document.createElement(tag); for (var k in (attrs||{})) e.setAttribute(k, attrs[k]); if (html!=null) e.innerHTML=html; return e; }
   var store = {
     get:function(k){ try{ return JSON.parse(localStorage.getItem("ctc:"+k)); }catch(e){ return null; } },
     set:function(k,v){ try{ localStorage.setItem("ctc:"+k, JSON.stringify(v)); }catch(e){} }
   };
 
-  function buildStrip(el, mode, key){
-    el.innerHTML = "";
+  function buildStrip(box, mode, key){
+    box.innerHTML = "";
     for (var i=0;i<26;i++){
-      var c=document.createElement("div"); c.className="cell";
-      var t=document.createElement("span"); t.className="top"; t.textContent=A[i]; c.appendChild(t);
-      var b=document.createElement("span");
+      var c=el("div",{"class":"cell"});
+      var t=el("span",{"class":"top"}); t.textContent=A[i]; c.appendChild(t);
+      var b=el("span");
       if (mode==="map"){ b.className="bot"; b.textContent=A[(i+key)%26]; }
       else { b.className="num"; b.textContent=String(i+1); }
-      c.appendChild(b); el.appendChild(c);
+      c.appendChild(b); box.appendChild(c);
     }
   }
 
@@ -260,7 +236,7 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
     var ms=performance.now()-t0;
     listEl.innerHTML="";
     out.forEach(function(o,i){
-      var d=document.createElement("div"); d.textContent="key "+o.k+" → "+o.text;
+      var d=el("div"); d.textContent="key "+o.k+" → "+o.text;
       if (o.k===key) d.className="hit";
       d.style.opacity="0"; listEl.appendChild(d);
       setTimeout(function(){ d.style.opacity="1"; }, matchMedia("(prefers-reduced-motion: reduce)").matches?0:i*45);
@@ -269,19 +245,45 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
   }
 
   /* ---------------- student ---------------- */
-  var started = {}, timers = {}, solved = store.get("solved") || {};
+  function panelHTML(r){
+    var R=ROUNDS[r], n=R.n;
+    var head = '<div class="row" style="justify-content:space-between"><span class="eyebrow" style="color:var('+(R.known?'--teal':'--red')+')">Round '+n+' · '+(R.known?'You have the key':'No key')+'</span><span class="pill time" id="'+r+'Time">0:00</span></div>'
+      + '<div class="cipher" id="'+r+'Cipher"></div>';
+    var body = R.known
+      ? '<div class="row"><span class="pill key">KEY = '+R.key+'</span><span class="muted" style="font-size:14px">Find each letter in the <b style="color:var(--teal)">code</b> row. The real letter is above it.</span></div>'
+        + '<div class="legend"><span><b>Top</b> = real letter</span><span><b class="t">Bottom</b> = code letter</span></div>'
+      : '<div class="row"><span class="pill nokey">KEY = ?</span><span class="muted" style="font-size:14px">Try keys on paper. Move each letter <b style="color:var(--fg)">back</b> by the key.</span></div>'
+        + '<p style="margin:0;font-size:14px">Split the work: each person tests a few keys. One key moves <b>every</b> letter back by the same number.</p>'
+        + '<div class="split"><div>Part 1<b>keys 1–8</b></div><div>Part 2<b>keys 9–16</b></div><div>Part 3<b>keys 17–25</b></div></div>'
+        + '<div class="legend"><span>Example with key 2: every letter moves back 2, so <b>D</b> (4) becomes <b>B</b> (2). Test the first word only; when it becomes a real word, you found the key.</span></div>';
+    var form = '<div class="strip" id="'+r+'Strip"></div>'
+      + '<form class="answerForm" data-round="'+r+'" style="display:flex;flex-direction:column;gap:10px">'
+      + '<label for="'+r+'Answer" class="muted" style="font-size:14px">Your answer</label>'
+      + '<div class="row" style="flex-wrap:nowrap"><input id="'+r+'Answer" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Type the real message"><button class="btn" type="submit">Check</button></div>'
+      + '<div class="feedback" id="'+r+'Feedback" aria-live="polite"></div></form>';
+    var hints = R.known ? '' : '<div class="hint" id="'+r+'Hint1" hidden>'+R.hints[0]+'</div><div class="hint" id="'+r+'Hint2" hidden>'+R.hints[1]+'</div><button class="btn ghost" id="'+r+'HintBtn" type="button" hidden>Show a hint</button>';
+    return head+body+form+hints+'<div id="'+r+'Done" hidden></div>';
+  }
+  var started = {}, solved = store.get("solved") || {};
   Object.keys(solved).forEach(function(r){ if (!ROUNDS[r] || !solved[r] || solved[r].cipher !== ROUNDS[r].cipher) delete solved[r]; });
   store.set("solved", solved);
+  function nextOf(r){ var i=ORDER.indexOf(r); return i<ORDER.length-1 ? ORDER[i+1] : "pc"; }
   function resetAll(){
     solved = {}; started = {}; store.set("solved", solved);
-    ["r1","r2"].forEach(function(r){ $(r+"Done").hidden=true; $(r+"Done").innerHTML=""; $(r).querySelector(".answerForm").hidden=false; $(r+"Answer").value=""; $(r+"Feedback").textContent=""; $(r+"Time").textContent="0:00"; });
-    $("r2Hint").hidden=true; $("r2Hint2").hidden=true; $("hintBtn").hidden=true; $("tryList").innerHTML=""; $("bruteResult").textContent="";
+    ORDER.forEach(function(r){ $(r+"Done").hidden=true; $(r+"Done").innerHTML=""; $(r).querySelector(".answerForm").hidden=false; $(r+"Answer").value=""; $(r+"Feedback").textContent=""; $(r+"Time").textContent="0:00";
+      if (!ROUNDS[r].known){ $(r+"Hint1").hidden=true; $(r+"Hint2").hidden=true; $(r+"HintBtn").hidden=true; } });
+    $("tryList").innerHTML=""; $("bruteResult").textContent="";
     refreshTabs(); showRound("r1"); window.scrollTo(0,0);
   }
   function startStudent(){
     $("student").hidden=false;
-    $("r1Cipher").textContent=ROUNDS.r1.cipher; $("r2Cipher").textContent=ROUNDS.r2.cipher;
-    buildStrip($("r1Strip"),"map",3); buildStrip($("r2Strip"),"num",0);
+    var host=$("roundPanels");
+    ORDER.forEach(function(r){
+      var sec=el("section",{id:r,"class":"panel",role:"tabpanel"}, panelHTML(r)); sec.hidden = r!=="r1"; host.appendChild(sec);
+      $(r+"Cipher").textContent=ROUNDS[r].cipher;
+      buildStrip($(r+"Strip"), ROUNDS[r].known?"map":"num", ROUNDS[r].key);
+      if (!ROUNDS[r].known) $(r+"HintBtn").addEventListener("click",function(){ if ($(r+"Hint1").hidden) $(r+"Hint1").hidden=false; else $(r+"Hint2").hidden=false; $(r+"HintBtn").hidden=true; });
+    });
     var team = store.get("team");
     if (team) enterGame(team); else $("join").hidden=false;
     $("joinForm").addEventListener("submit",function(e){ e.preventDefault(); var n=$("teamInput").value.trim(); if(!n){ $("teamInput").focus(); return; } store.set("team",n); enterGame(n); });
@@ -289,25 +291,26 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
     $("renameBtn").addEventListener("click",function(){ $("game").hidden=true; $("join").hidden=false; $("teamInput").value=$("teamName").textContent; $("teamInput").focus(); });
     document.querySelectorAll("#game .tab").forEach(function(b){ b.addEventListener("click",function(){ showRound(b.dataset.round); }); });
     document.querySelectorAll(".answerForm").forEach(function(f){ f.addEventListener("submit",function(e){ e.preventDefault(); check(f.dataset.round); }); });
-    $("hintBtn").addEventListener("click",function(){ if ($("r2Hint").hidden) $("r2Hint").hidden=false; else $("r2Hint2").hidden=false; $("hintBtn").hidden=true; });
-    $("bruteBtn").addEventListener("click",function(){ bruteForce(ROUNDS.r2.cipher,$("tryList"),$("bruteResult"),ROUNDS.r2.key); });
+    $("bruteBtn").addEventListener("click",function(){ bruteForce(ROUNDS.r4.cipher,$("tryList"),$("bruteResult"),ROUNDS.r4.key); });
     setInterval(tick,500);
   }
   function enterGame(team){
     $("join").hidden=true; $("game").hidden=false; $("teamName").textContent=team;
-    refreshTabs(); showRound(solved.r1 ? (solved.r2 ? "pc" : "r2") : "r1");
-    if (solved.r1) markDone("r1"); if (solved.r2) markDone("r2");
+    refreshTabs();
+    var first = ORDER.filter(function(r){ return !solved[r]; })[0] || "pc";
+    showRound(first);
+    ORDER.forEach(function(r){ if (solved[r]) markDone(r); });
   }
-  function refreshTabs(){ $("tab-r2").disabled=!solved.r1; $("tab-pc").disabled=!solved.r2; }
+  function refreshTabs(){ ORDER.forEach(function(r,i){ $("tab-"+r).disabled = i>0 && !solved[ORDER[i-1]]; }); $("tab-pc").disabled=!solved.r4; }
   function showRound(r){
-    ["r1","r2","pc"].forEach(function(x){ $(x).hidden = x!==r; $("tab-"+x).setAttribute("aria-selected", x===r?"true":"false"); });
-    if ((r==="r1"||r==="r2") && !started[r]) started[r]=Date.now();
+    ORDER.concat(["pc"]).forEach(function(x){ $(x).hidden = x!==r; $("tab-"+x).setAttribute("aria-selected", x===r?"true":"false"); });
+    if (ROUNDS[r] && !started[r]) started[r]=Date.now();
   }
   function tick(){
-    ["r1","r2"].forEach(function(r){
+    ORDER.forEach(function(r){
       if (!started[r] || solved[r]) return;
       var s=(Date.now()-started[r])/1000; $(r+"Time").textContent=fmt(s);
-      if (r==="r2"){ if ($("r2Hint").hidden){ if (s>75) $("hintBtn").hidden=false; } else if ($("r2Hint2").hidden && s>120) $("hintBtn").hidden=false; }
+      if (!ROUNDS[r].known){ if ($(r+"Hint1").hidden){ if (s>HINT_AT[0]) $(r+"HintBtn").hidden=false; } else if ($(r+"Hint2").hidden && s>HINT_AT[1]) $(r+"HintBtn").hidden=false; }
     });
   }
   function check(r){
@@ -324,20 +327,20 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
     }
   }
   function markDone(r){
-    var s=solved[r], box=$(r+"Done");
-    box.innerHTML=""; var c=document.createElement("div"); c.className="cracked";
-    var big=document.createElement("div"); big.className="big"; big.textContent="CRACKED";
-    var ans=document.createElement("div"); ans.className="ans"; ans.textContent=s.answer;
-    var meta=document.createElement("div"); meta.className="meta"; meta.textContent="Team "+$("teamName").textContent+" · "+(r==="r1"?"Round 1":"Round 2")+" · "+s.time;
-    var tip=document.createElement("div"); tip.textContent="Hold up this screen!";
+    var s=solved[r], box=$(r+"Done"), nx=nextOf(r);
+    box.innerHTML=""; var c=el("div",{"class":"cracked"});
+    var big=el("div",{"class":"big"}); big.textContent="CRACKED";
+    var ans=el("div",{"class":"ans"}); ans.textContent=s.answer;
+    var meta=el("div",{"class":"meta"}); meta.textContent=$("teamName").textContent+" · Round "+ROUNDS[r].n+" · "+s.time;
+    var tip=el("div"); tip.textContent="Hold up this screen!";
     [big,ans,meta,tip].forEach(function(x){ c.appendChild(x); });
     box.appendChild(c);
-    var next=document.createElement("button"); next.className="btn ghost"; next.type="button"; next.style.marginTop="10px";
-    next.textContent = r==="r1" ? "Go to Round 2 when your presenter says so" : "Bonus: let a computer try";
-    next.addEventListener("click",function(){ showRound(r==="r1"?"r2":"pc"); window.scrollTo(0,0); });
+    var next=el("button",{"class":"btn ghost",type:"button"}); next.style.marginTop="10px";
+    next.textContent = nx==="pc" ? "Bonus: let a computer try" : "Go to Round "+ROUNDS[nx].n+" when your presenter says so";
+    next.addEventListener("click",function(){ showRound(nx); window.scrollTo(0,0); });
     box.appendChild(next);
     box.hidden=false; $(r).querySelector(".answerForm").hidden=true; $(r+"Time").textContent=s.time;
-    if (r==="r2"){ $("hintBtn").hidden=true; }
+    if (!ROUNDS[r].known) $(r+"HintBtn").hidden=true;
   }
 
   /* ---------------- host ---------------- */
@@ -351,23 +354,23 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
     $("hStart").addEventListener("click",function(){ running=!running; lastT=performance.now(); $("hStart").textContent=running?"Pause":"Start timer"; });
     $("hReset").addEventListener("click",function(){ remaining=ROUNDS[hStep].secs; running=false; $("hStart").textContent="Start timer"; drawTimer(); });
     $("hReveal").addEventListener("click",function(){ $("hAnswer").hidden=false; });
-    $("hBrute").addEventListener("click",function(){ bruteForce(ROUNDS.r2.cipher,$("hTryList"),$("hBruteResult"),ROUNDS.r2.key); });
+    $("hBrute").addEventListener("click",function(){ bruteForce(ROUNDS.r4.cipher,$("hTryList"),$("hBruteResult"),ROUNDS.r4.key); });
     $("toStudent").addEventListener("click",function(){ location.hash=""; });
     setStep("r1");
     (function loop(t){ if(running){ remaining-=(t-lastT)/1000; if(remaining<=0){ remaining=0; running=false; $("hStart").textContent="Start timer"; } } lastT=t; drawTimer(); requestAnimationFrame(loop); })(performance.now());
   }
-  function drawTimer(){ var el=$("hTimer"); el.textContent=fmt(Math.ceil(remaining)); el.classList.toggle("low", remaining<=20); }
+  function drawTimer(){ var e=$("hTimer"); e.textContent=fmt(Math.ceil(remaining)); e.classList.toggle("low", remaining<=20); }
   function setStep(s){
     hStep=s;
-    ["r1","r2","db"].forEach(function(x){ $("htab-"+x).setAttribute("aria-selected", x===s?"true":"false"); });
+    ORDER.concat(["db"]).forEach(function(x){ $("htab-"+x).setAttribute("aria-selected", x===s?"true":"false"); });
     $("hostRound").hidden = s==="db"; $("hostDebrief").hidden = s!=="db";
     if (s==="db") return;
     var R=ROUNDS[s];
-    $("hEyebrow").textContent = s==="r1" ? "Round 1 · You have the key" : "Round 2 · No key";
-    $("hEyebrow").style.color = s==="r1" ? "var(--teal)" : "var(--red)";
-    $("hKey").className = "pill " + (s==="r1"?"key":"nokey"); $("hKey").textContent = s==="r1" ? "KEY = 3" : "KEY = ?";
+    $("hEyebrow").textContent = "Round "+R.n+" · "+(R.known ? "You have the key" : "No key");
+    $("hEyebrow").style.color = R.known ? "var(--teal)" : "var(--red)";
+    $("hKey").className = "pill " + (R.known?"key":"nokey"); $("hKey").textContent = R.known ? "KEY = "+R.key : "KEY = ?";
     $("hCipher").textContent=R.cipher;
-    buildStrip($("hStrip"), s==="r1"?"map":"num", R.key);
+    buildStrip($("hStrip"), R.known?"map":"num", R.key);
     remaining=R.secs; running=false; $("hStart").textContent="Start timer"; drawTimer();
     $("hAnswer").hidden=true; $("hAnswerLabel").textContent="Answer · key = "+R.key; $("hAnswerText").textContent=shift(R.cipher,-R.key);
   }
