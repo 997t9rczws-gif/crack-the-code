@@ -113,7 +113,6 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
       <button class="tab" role="tab" id="tab-r1" data-round="r1">Round 1</button>
       <button class="tab" role="tab" id="tab-r2" data-round="r2">Round 2</button>
       <button class="tab" role="tab" id="tab-r3" data-round="r3">Round 3</button>
-      <button class="tab" role="tab" id="tab-r4" data-round="r4">Round 4</button>
       <button class="tab" role="tab" id="tab-pc" data-round="pc">Computer</button>
     </nav>
 
@@ -155,7 +154,6 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
         <button class="tab" role="tab" id="htab-r1" data-step="r1">Round 1</button>
         <button class="tab" role="tab" id="htab-r2" data-step="r2">Round 2</button>
         <button class="tab" role="tab" id="htab-r3" data-step="r3">Round 3</button>
-        <button class="tab" role="tab" id="htab-r4" data-step="r4">Round 4</button>
         <button class="tab" role="tab" id="htab-db" data-step="db">Debrief</button>
       </nav>
       <div class="panel" id="hostRound">
@@ -200,12 +198,11 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
 (function(){
   var STUDENT_URL = "https://997t9rczws-gif.github.io/crack-the-code/";
   var A = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  var ORDER = ["r1","r2","r3","r4"];
+  var ORDER = ["r1","r2","r3"];
   var ROUNDS = {
     r1:{n:1, cipher:"VWURQJ SDVVZRUGV", key:3,  secs:120, known:true},
-    r2:{n:2, cipher:"SVJR FVBY WOVUL",  key:7,  secs:120, known:true},
-    r3:{n:3, cipher:"THYDA MQJUH",      key:16, secs:180, known:false, hints:["Hint 1: the key is bigger than 10.","Hint 2: the key is 15, 16 or 17."]},
-    r4:{n:4, cipher:"RZGG YJIZ",        key:21, secs:180, known:false, hints:["Hint 1: the key is bigger than 16.","Hint 2: the key is 20, 21 or 22."]}
+    r2:{n:2, cipher:"ZAHF ZHML",        key:7,  secs:120, known:true},
+    r3:{n:3, cipher:"THYDA MQJUH",      key:16, secs:180, known:false, hints:["Hint 1: the key is bigger than 10.","Hint 2: the key is 15, 16 or 17."]}
   };
   var HINT_AT=[75,120];
   function shift(text, k){ return text.replace(/[A-Z]/g, function(c){ return A[(A.indexOf(c)+k+26*10)%26]; }); }
@@ -291,7 +288,7 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
     $("renameBtn").addEventListener("click",function(){ $("game").hidden=true; $("join").hidden=false; $("teamInput").value=$("teamName").textContent; $("teamInput").focus(); });
     document.querySelectorAll("#game .tab").forEach(function(b){ b.addEventListener("click",function(){ showRound(b.dataset.round); }); });
     document.querySelectorAll(".answerForm").forEach(function(f){ f.addEventListener("submit",function(e){ e.preventDefault(); check(f.dataset.round); }); });
-    $("bruteBtn").addEventListener("click",function(){ bruteForce(ROUNDS.r4.cipher,$("tryList"),$("bruteResult"),ROUNDS.r4.key); });
+    $("bruteBtn").addEventListener("click",function(){ bruteForce(ROUNDS.r3.cipher,$("tryList"),$("bruteResult"),ROUNDS.r3.key); });
     setInterval(tick,500);
   }
   function enterGame(team){
@@ -301,7 +298,7 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
     showRound(first);
     ORDER.forEach(function(r){ if (solved[r]) markDone(r); });
   }
-  function refreshTabs(){ ORDER.forEach(function(r,i){ $("tab-"+r).disabled = i>0 && !solved[ORDER[i-1]]; }); $("tab-pc").disabled=!solved.r4; }
+  function refreshTabs(){ ORDER.forEach(function(r,i){ $("tab-"+r).disabled = i>0 && !solved[ORDER[i-1]]; }); $("tab-pc").disabled=!solved.r3; }
   function showRound(r){
     ORDER.concat(["pc"]).forEach(function(x){ $(x).hidden = x!==r; $("tab-"+x).setAttribute("aria-selected", x===r?"true":"false"); });
     if (ROUNDS[r] && !started[r]) started[r]=Date.now();
@@ -354,7 +351,7 @@ input[type=text]::placeholder{color:#6F7E93;font-weight:500;letter-spacing:0;tex
     $("hStart").addEventListener("click",function(){ running=!running; lastT=performance.now(); $("hStart").textContent=running?"Pause":"Start timer"; });
     $("hReset").addEventListener("click",function(){ remaining=ROUNDS[hStep].secs; running=false; $("hStart").textContent="Start timer"; drawTimer(); });
     $("hReveal").addEventListener("click",function(){ $("hAnswer").hidden=false; });
-    $("hBrute").addEventListener("click",function(){ bruteForce(ROUNDS.r4.cipher,$("hTryList"),$("hBruteResult"),ROUNDS.r4.key); });
+    $("hBrute").addEventListener("click",function(){ bruteForce(ROUNDS.r3.cipher,$("hTryList"),$("hBruteResult"),ROUNDS.r3.key); });
     $("toStudent").addEventListener("click",function(){ location.hash=""; });
     setStep("r1");
     (function loop(t){ if(running){ remaining-=(t-lastT)/1000; if(remaining<=0){ remaining=0; running=false; $("hStart").textContent="Start timer"; } } lastT=t; drawTimer(); requestAnimationFrame(loop); })(performance.now());
